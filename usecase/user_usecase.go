@@ -3,6 +3,7 @@ package usecase
 import (
 	"api-golang/model"
 	"api-golang/repository"
+	"fmt"
 )
 
 type UserUseCase struct {
@@ -17,4 +18,17 @@ func NewUserUseCase(repo repository.UserRepository) UserUseCase {
 
 func (uc *UserUseCase) GetUsers() ([]model.User, error) {
 	return uc.repository.GetAllUsers()
+}
+
+func (uc *UserUseCase) CreateUser(user model.User) (model.User, error) {
+	userId, err := uc.repository.CreateUser(user)
+
+	if err != nil {
+		fmt.Println(err)
+		return model.User{}, err
+	}
+
+	user.ID = userId
+
+	return user, nil
 }

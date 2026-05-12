@@ -50,3 +50,25 @@ func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
 	return userList, nil
 
 }
+
+func (ur *UserRepository) CreateUser(user model.User) (int, error) {
+
+	var id int
+	query, err := ur.connection.Prepare("INSERT INTO users" +
+		"(name, email)" +
+		" VALUES ($1, $2) RETURNING id")
+
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+
+	err = query.QueryRow(user.Name, user.Email).Scan(&id)
+
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+
+	return id, nil
+}

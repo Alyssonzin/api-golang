@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"api-golang/model"
 	"api-golang/usecase"
 	"fmt"
 	"net/http"
@@ -27,4 +28,24 @@ func (u *userController) GetUsers(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, users)
+}
+
+func (u *userController) CreateUser(ctx *gin.Context) {
+	var user model.User
+
+	err := ctx.BindJSON(&user)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	newUser, err := u.userUseCase.CreateUser(user)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, newUser)
 }
