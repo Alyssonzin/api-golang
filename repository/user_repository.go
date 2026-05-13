@@ -70,5 +70,36 @@ func (ur *UserRepository) CreateUser(user model.User) (int, error) {
 		return 0, err
 	}
 
+	query.Close()
 	return id, nil
+}
+
+func (ur *UserRepository) GetById(id int) (*model.User, error) {
+	query, err := ur.connection.Prepare("SELECT * FROM users WHERE id = $1")
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var user model.User
+	err = query.QueryRow(id).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		fmt.Println(err)
+		return nil, err
+	}
+
+	query.Close()
+	return &user, nil
 }

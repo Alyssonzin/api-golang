@@ -20,6 +20,16 @@ func (uc *UserUseCase) GetUsers() ([]model.User, error) {
 	return uc.repository.GetAllUsers()
 }
 
+func (uc *UserUseCase) GetById(id int) (*model.User, error) {
+	user, err := uc.repository.GetById(id)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (uc *UserUseCase) CreateUser(user model.User) (model.User, error) {
 	userId, err := uc.repository.CreateUser(user)
 

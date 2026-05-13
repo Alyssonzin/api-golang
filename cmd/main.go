@@ -34,6 +34,7 @@ func main() {
 	UserGroup := server.Group("/user")
 	UserGroup.GET("/", UserController.GetUsers)
 	UserGroup.POST("/", UserController.CreateUser)
+	UserGroup.GET("/:id", UserController.GetById)
 
 	server.Run(":8080")
 }

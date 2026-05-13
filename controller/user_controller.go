@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"api-golang/dto"
 	"api-golang/model"
 	"api-golang/usecase"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +30,42 @@ func (u *userController) GetUsers(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, users)
+}
+
+func (u *userController) GetById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		res := dto.Response{
+			Message: "ID do usuário é obrigatório",
+		}
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		res := dto.Response{
+			Message: "ID do usuário precisa ser número",
+		}
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	user, err := u.userUseCase.GetById(userId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	if user == nil {
+		res := dto.Response{
+			Message: "Usuário não encontrado",
+		}
+		ctx.JSON(http.StatusNotFound, res)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
 }
 
 func (u *userController) CreateUser(ctx *gin.Context) {
