@@ -1,4 +1,4 @@
-package http
+package httpx
 
 import (
 	"context"
@@ -21,7 +21,7 @@ func NewHttpClient(baseURL string, timeout time.Duration) *HttpClient {
 	}
 }
 
-func (c *HttpClient) setHeader(key, value string) {
+func (c *HttpClient) SetHeader(key, value string) {
 	if c.headers == nil {
 		c.headers = make(http.Header)
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"api-golang/controller"
 	"api-golang/db"
+	"api-golang/internal/integrations/pluggy"
 	"api-golang/repository"
 	"api-golang/usecase"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 
 func main() {
 	server := gin.Default()
+
+	pluggyClient := pluggy.NewPluggyClient("http://localhost:8000")
 
 	dbConnection, error := db.ConnectDB()
 
@@ -29,6 +32,19 @@ func main() {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "HELLO WORLD",
 		})
+	})
+
+	server.GET("/test", func(ctx *gin.Context) {
+
+		data, err := pluggyClient.GetItem(ctx.Request.Context())
+		if err != nil {
+			ctx.JSON(http.StatusBadGateway, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		ctx.Data(http.StatusOK, "application/json", data)
 	})
 
 	UserGroup := server.Group("/user")
