@@ -14,7 +14,7 @@ import (
 func main() {
 	server := gin.Default()
 
-	pluggyClient := pluggy.NewPluggyClient("http://localhost:8000")
+	pluggyClient := pluggy.NewPluggyClient()
 
 	dbConnection, error := db.ConnectDB()
 
@@ -34,9 +34,9 @@ func main() {
 		})
 	})
 
-	server.GET("/test", func(ctx *gin.Context) {
+	server.POST("/auth", func(ctx *gin.Context) {
 
-		data, err := pluggyClient.GetItem(ctx.Request.Context())
+		data, err := pluggyClient.CreateApiKey(ctx.Request.Context(), "client_id", "client_secret")
 		if err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{
 				"error": err.Error(),
@@ -44,7 +44,13 @@ func main() {
 			return
 		}
 
-		ctx.Data(http.StatusOK, "application/json", data)
+		resp := struct {
+			ApiKey string `json:"apiKey"`
+		}{
+			ApiKey: data.ApiKey,
+		}
+
+		ctx.JSON(http.StatusOK, resp)
 	})
 
 	UserGroup := server.Group("/user")

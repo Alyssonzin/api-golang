@@ -56,11 +56,19 @@ func (c *HttpClient) Get(ctx context.Context, path string, headers http.Header) 
 	return c.Do(ctx, http.MethodGet, path, headers, nil)
 }
 
-func (c *HttpClient) Post(ctx context.Context, path string, headers http.Header, body io.Reader) (*http.Response, error) {
+func (c *HttpClient) Post(ctx context.Context, path string, body io.Reader, headers http.Header) (*http.Response, error) {
+	if headers == nil {
+		headers = make(http.Header)
+	}
+	headers.Set("Content-Type", "application/json")
 	return c.Do(ctx, http.MethodPost, path, headers, body)
 }
 
-func (c *HttpClient) Put(ctx context.Context, path string, headers http.Header, body io.Reader) (*http.Response, error) {
+func (c *HttpClient) Put(ctx context.Context, path string, body io.Reader, headers http.Header) (*http.Response, error) {
+	if headers == nil {
+		headers = make(http.Header)
+	}
+	headers.Set("Content-Type", "application/json")
 	return c.Do(ctx, http.MethodPut, path, headers, body)
 }
 
