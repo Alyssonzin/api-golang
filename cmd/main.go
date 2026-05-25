@@ -8,13 +8,18 @@ import (
 	"api-golang/usecase"
 	"net/http"
 
+	"api-golang/config"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	envs := config.LoadEnvs(".env")
 	server := gin.Default()
 
-	pluggyClient := pluggy.NewPluggyClient()
+	pluggyClient := pluggy.NewPluggyClient(envs.PluggyClientID, envs.PluggyClientSecret)
+	pluggyApikeyUseCase := usecase.NewPluggyApikeyUseCase(pluggyClient)
+	PluggyController := controller.NewPluggyController(pluggyApikeyUseCase)
 
 	dbConnection, error := db.ConnectDB()
 
@@ -34,24 +39,7 @@ func main() {
 		})
 	})
 
-	server.POST("/auth", func(ctx *gin.Context) {
-
-		data, err := pluggyClient.CreateApiKey(ctx.Request.Context(), "client_id", "client_secret")
-		if err != nil {
-			ctx.JSON(http.StatusBadGateway, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		resp := struct {
-			ApiKey string `json:"apiKey"`
-		}{
-			ApiKey: data.ApiKey,
-		}
-
-		ctx.JSON(http.StatusOK, resp)
-	})
+	server.POST("/auth", PluggyController.CreatePluggyApikey)
 
 	UserGroup := server.Group("/user")
 	UserGroup.GET("/", UserController.GetUsers)

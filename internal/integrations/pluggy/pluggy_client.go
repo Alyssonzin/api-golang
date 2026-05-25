@@ -12,15 +12,19 @@ import (
 )
 
 type PluggyClient struct {
-	client *httpx.HttpClient
+	client       *httpx.HttpClient
+	clientID     string
+	clientSecret string
 }
 
-func NewPluggyClient() *PluggyClient {
+func NewPluggyClient(clientID, clientSecret string) *PluggyClient {
 	c := httpx.NewHttpClient("https://api.pluggy.ai", 5*time.Second)
 	c.SetHeader("Accept", "application/json")
 
 	return &PluggyClient{
-		client: c,
+		client:       c,
+		clientID:     clientID,
+		clientSecret: clientSecret,
 	}
 }
 
@@ -38,10 +42,10 @@ func (c *PluggyClient) GetItem(ctx context.Context) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func (c *PluggyClient) CreateApiKey(ctx context.Context, clientID string, clientSecret string) (*dtos.CreateApiKeyResponse, error) {
+func (c *PluggyClient) CreateApiKey(ctx context.Context) (*dtos.CreateApiKeyResponse, error) {
 	req := dtos.CreateApiKeyRequest{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
+		ClientID:     c.clientID,
+		ClientSecret: c.clientSecret,
 	}
 
 	payload, err := json.Marshal(req)
