@@ -18,8 +18,8 @@ func main() {
 	server := gin.Default()
 
 	pluggyClient := pluggy.NewPluggyClient(envs.PluggyClientID, envs.PluggyClientSecret)
-	pluggyApikeyUseCase := usecase.NewPluggyApikeyUseCase(pluggyClient)
-	PluggyController := controller.NewPluggyController(pluggyApikeyUseCase)
+	pluggyUseCase := usecase.NewPluggyUseCase(pluggyClient)
+	PluggyController := controller.NewPluggyController(pluggyUseCase)
 
 	dbConnection, error := db.ConnectDB()
 
@@ -40,6 +40,7 @@ func main() {
 	})
 
 	server.POST("/auth", PluggyController.CreatePluggyApikey)
+	server.GET("/item/:item_id", PluggyController.GetItem)
 
 	UserGroup := server.Group("/user")
 	UserGroup.GET("/", UserController.GetUsers)

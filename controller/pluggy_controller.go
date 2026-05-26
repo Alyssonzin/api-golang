@@ -8,10 +8,10 @@ import (
 )
 
 type pluggyController struct {
-	pluggyApikeyUseCase usecase.PluggyApikeyUseCase
+	pluggyApikeyUseCase usecase.PluggyUseCase
 }
 
-func NewPluggyController(pluggyApikeyUseCase usecase.PluggyApikeyUseCase) pluggyController {
+func NewPluggyController(pluggyApikeyUseCase usecase.PluggyUseCase) pluggyController {
 	return pluggyController{pluggyApikeyUseCase: pluggyApikeyUseCase}
 }
 
@@ -22,4 +22,14 @@ func (c *pluggyController) CreatePluggyApikey(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"api_key": apiKey})
+}
+
+func (c *pluggyController) GetItem(ctx *gin.Context) {
+	itemID := ctx.Param("item_id")
+	item, err := c.pluggyApikeyUseCase.GetItem(ctx, itemID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, item)
 }

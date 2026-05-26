@@ -45,8 +45,8 @@ func (c *HttpClient) Do(
 		return nil, err
 	}
 
-	//mescla os headers globais do cliente com os headers específicos da requisição
-	mergeHeaders(c.headers, headers)
+	// mescla os headers globais do cliente com os headers especificos da requisicao
+	mergeHeaders(req.Header, c.headers)
 	mergeHeaders(req.Header, headers)
 
 	return c.client.Do(req)
