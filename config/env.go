@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -20,7 +19,7 @@ type Envs struct {
 
 func LoadEnvs(path string) Envs {
 	if err := godotenv.Load(path); err != nil {
-		log.Printf("aviso: arquivo .env nao encontrado, usando variaveis do sistema")
+		panic(err)
 	}
 
 	return Envs{

@@ -1,37 +1,16 @@
 package main
 
 import (
-	"api-golang/controller"
-	"api-golang/db"
-	"api-golang/internal/integrations/pluggy"
-	"api-golang/repository"
-	"api-golang/usecase"
+	"api-golang/internal/container"
 	"net/http"
-
-	"api-golang/config"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	envs := config.LoadEnvs(".env")
 	server := gin.Default()
 
-	pluggyClient := pluggy.NewPluggyClient(envs.PluggyClientID, envs.PluggyClientSecret)
-	pluggyUseCase := usecase.NewPluggyUseCase(pluggyClient)
-	PluggyController := controller.NewPluggyController(pluggyUseCase)
-
-	dbConnection, error := db.ConnectDB()
-
-	if error != nil {
-		panic(error)
-	}
-
-	UserRepository := repository.NewUserRepository(dbConnection)
-
-	UserUseCase := usecase.NewUserUseCase(UserRepository)
-
-	UserController := controller.NewUserController(UserUseCase)
+	pluggyController, userController := container.BuildContainer()
 
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -39,13 +18,13 @@ func main() {
 		})
 	})
 
-	server.POST("/auth", PluggyController.CreatePluggyApikey)
-	server.GET("/item/:item_id", PluggyController.GetItem)
+	server.POST("/auth", pluggyController.CreatePluggyApikey)
+	server.GET("/item/:item_id", pluggyController.GetItem)
 
-	UserGroup := server.Group("/user")
-	UserGroup.GET("/", UserController.GetUsers)
-	UserGroup.POST("/", UserController.CreateUser)
-	UserGroup.GET("/:id", UserController.GetById)
+	userGroup := server.Group("/user")
+	userGroup.GET("/", userController.GetUsers)
+	userGroup.POST("/", userController.CreateUser)
+	userGroup.GET("/:id", userController.GetById)
 
 	server.Run(":8080")
 }

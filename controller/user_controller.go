@@ -11,17 +11,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type userController struct {
+type UserController struct {
 	userUseCase usecase.UserUseCase
 }
 
-func NewUserController(uc usecase.UserUseCase) userController {
-	return userController{
+func NewUserController(uc usecase.UserUseCase) *UserController {
+	return &UserController{
 		userUseCase: uc,
 	}
 }
 
-func (u *userController) GetUsers(ctx *gin.Context) {
+func (u *UserController) GetUsers(ctx *gin.Context) {
 	users, err := u.userUseCase.GetUsers()
 
 	if err != nil {
@@ -32,7 +32,7 @@ func (u *userController) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, users)
 }
 
-func (u *userController) GetById(ctx *gin.Context) {
+func (u *UserController) GetById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		res := dto.Response{
@@ -68,7 +68,7 @@ func (u *userController) GetById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (u *userController) CreateUser(ctx *gin.Context) {
+func (u *UserController) CreateUser(ctx *gin.Context) {
 	var user model.User
 
 	err := ctx.BindJSON(&user)

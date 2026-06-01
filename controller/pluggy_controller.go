@@ -7,15 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type pluggyController struct {
+type PluggyController struct {
 	pluggyApikeyUseCase usecase.PluggyUseCase
 }
 
-func NewPluggyController(pluggyApikeyUseCase usecase.PluggyUseCase) pluggyController {
-	return pluggyController{pluggyApikeyUseCase: pluggyApikeyUseCase}
+func NewPluggyController(pluggyApikeyUseCase usecase.PluggyUseCase) *PluggyController {
+	return &PluggyController{pluggyApikeyUseCase: pluggyApikeyUseCase}
 }
 
-func (c *pluggyController) CreatePluggyApikey(ctx *gin.Context) {
+func (c *PluggyController) CreatePluggyApikey(ctx *gin.Context) {
 	apiKey, err := c.pluggyApikeyUseCase.CreatePluggyApikey(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -24,7 +24,7 @@ func (c *pluggyController) CreatePluggyApikey(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"api_key": apiKey})
 }
 
-func (c *pluggyController) GetItem(ctx *gin.Context) {
+func (c *PluggyController) GetItem(ctx *gin.Context) {
 	itemID := ctx.Param("item_id")
 	item, err := c.pluggyApikeyUseCase.GetItem(ctx, itemID)
 	if err != nil {
